@@ -26,10 +26,23 @@ public class CoronaVirusDataService {
 	@Scheduled(cron = "0 * * ? * *")
 	public List<LocationStats> getCoronaVirusData() throws IOException {
 		SimpleDateFormat sdfmt= new SimpleDateFormat("MM-dd-yyyy");
+		String result  = null;
 		Date dateNow = new Date();
+		
 		dateNow.setDate(dateNow.getDate()-1);
+		
+		Date beforeDate = new Date();
+		beforeDate.setDate(beforeDate.getDate()-2);
 		String date = sdfmt.format(dateNow);
-		String result  = restTemplate.getForObject(DATA_URL+date+".csv", String.class);
+		String date2 = sdfmt.format(beforeDate);
+		System.out.println(date);
+		System.out.println(date2);
+		try {
+		result  = restTemplate.getForObject(DATA_URL+date+".csv", String.class);
+		}
+		catch(Exception e) {
+	    result  = restTemplate.getForObject(DATA_URL+date2+".csv", String.class);
+		}
         StringReader csvStringReader = new StringReader(result);
         Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(csvStringReader);
         List<LocationStats> listOfLocs = new ArrayList<>();
